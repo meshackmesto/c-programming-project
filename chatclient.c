@@ -25,3 +25,27 @@ void* receive_messages(void* arg) {
     }
     return NULL;
 }
+
+int main() {
+    int msgid;
+    pthread_t recv_thread;
+    struct msg_buffer message;
+
+    msgid = msgget(MSG_KEY, 0666);
+    if (msgid == -1) {
+        perror("msgget failed");
+        exit(1);
+    }
+
+    // Start receive thread
+    pthread_create(&recv_thread, NULL, receive_messages, &msgid);
+
+    while (1) {
+        printf("> ");
+        fgets(message.msg_text, MAX_TEXT, stdin);
+        message.msg_type = 1;
+        msgsnd(msgid, &message, sizeof(message.msg_text), 0);
+    }
+
+    return 0;
+}
