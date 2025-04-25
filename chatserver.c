@@ -32,4 +32,24 @@ void* listen_for_messages(void* arg) {
         }
     }
     return NULL;
+
+}
+int main() {
+    int msgid;
+    pthread_t listener_thread;
+
+    // Create message queue
+    msgid = msgget(MSG_KEY, 0666 | IPC_CREAT);
+    if (msgid == -1) {
+        perror("msgget failed");
+        exit(1);
+    }
+
+    printf("Server started. Waiting for clients...\n");
+
+    // Start thread to listen for messages
+    pthread_create(&listener_thread, NULL, listen_for_messages, &msgid);
+    pthread_join(listener_thread, NULL);
+
+    return 0;
 }
